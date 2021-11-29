@@ -8,36 +8,44 @@ const preguntas = [
         message: 'Qué desea hacer?',
         choices: [
             {
-                value: '1',
-                name: `${ '1.'.green } Crear tarea`
+                value: 1,
+                name: `${ '1.'.green } Buscar ciudad`
             },
             {
-                value: '2',
-                name: `${ '2.'.green } Listar tareas`
+                value: 2,
+                name: `${ '2.'.green } Historial`
             },
             {
-                value: '3',
-                name: `${ '3.'.green } Listar tareas completadas`
-            },
-            {
-                value: '4',
-                name: `${ '4.'.green } Listar tareas pendientes`
-            },
-            {
-                value: '5',
-                name: `${ '5.'.green } Completar tarea(s)`
-            },
-            {
-                value: '6',
-                name: `${ '6.'.green } Borrar tarea`
-            },
-            {
-                value: '0',
-                name: `${ '0.'.red } salir`
-            },
+                value: 0,
+                name: `${ '3.'.green } Salir`
+            }
         ]
     }
 ];
+
+const inquirerMenu = async () => {
+    console.clear()
+    console.log('=============================='.green);
+    console.log('   Seleccione una opción'.white);
+    console.log('==============================\n'.green);
+
+    const { opcion } = await inquirer.prompt(preguntas);
+
+    return opcion;
+}
+
+const pausa = async () => {
+    const question = [
+        {
+            type: 'input',
+            name: 'enter',
+            message: `presione ${ 'ENTER'.green } para continuar`,
+        }
+    ]
+    console.log('\n')
+    await inquirer.prompt(question);
+}
+
 
 
 const listadoTareasBorrar = async (tareas = []) => {
@@ -69,28 +77,6 @@ const listadoTareasBorrar = async (tareas = []) => {
     return id
 }
 
-const inquirerMenu = async () => {
-    console.clear()
-    console.log('=============================='.green);
-    console.log('   Seleccione una opción'.white);
-    console.log('==============================\n'.green);
-
-    const { opcion } = await inquirer.prompt(preguntas);
-
-    return opcion;
-}
-
-const pausa = async () => {
-    const pregunta = [
-        {
-            type: 'input',
-            name: 'enter',
-            message: `presione ${ 'ENTER'.green } para continuar`,
-        }
-    ]
-    console.log('\n')
-    await inquirer.prompt(pregunta);
-}
 
 const leerInput = async (message) => {
     const question = [
