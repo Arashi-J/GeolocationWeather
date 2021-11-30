@@ -1,15 +1,42 @@
-class Busquedas{
+const axios = require('axios');
+
+class Busquedas {
     historial = ['Tegucigalpa', 'Madrid', 'San José', 'Bogotá'];
 
     constructor() {
         //TODO: leer DB si existe
     }
 
-    async ciudad (lugar = ''){
-        //Petición HTTP
-        console.log(lugar);
+    get paramsMapbox() {
+        return {
+            'access_token': process.env.MAPBOX_KEY,
+            'limit': 5,
+            'language': 'es'
+        }
+    }
 
-        return []; //Ciudades resultados
+    async ciudad(lugar = '') {
+
+        try {
+            //Petición HTTP
+            const instance = axios.create({
+                baseURL: `https://api.mapbox.com/geocoding/v5/mapbox.places/${ lugar }.json`,
+                params: this.paramsMapbox
+            });
+
+            const resp = await instance.get();
+
+            console.log(resp.data);
+
+
+            return []; //Ciudades resultados
+        }
+        catch (error) {
+            return [];
+        }
+
+
+
     }
 }
 
