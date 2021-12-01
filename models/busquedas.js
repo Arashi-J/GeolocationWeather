@@ -1,10 +1,19 @@
+const fs = require('fs');
 const axios = require('axios');
 
+
 class Busquedas {
-    historial = ['Tegucigalpa', 'Madrid', 'San José', 'Bogotá'];
+    historial = [];
+    dbPath = './db/database.json';
+
 
     constructor() {
-        //TODO: leer DB si existe
+        this.leerDB()
+    }
+
+    get historialCapitalizado(){
+
+        return this.historial.map(lugar => lugar.replace(/(^\w|\s\w)/g, m => m.toUpperCase()));
     }
 
     get paramsMapbox() {
@@ -17,10 +26,8 @@ class Busquedas {
     get paramsWeather() {
         return {
             appid: process.env.OPENWEATHER_KEY,
-                lat,
-                lon,
-                units: 'metric',
-                    lang: 'es'
+            units: 'metric',
+            lang: 'es'
         }
     }
 
@@ -54,18 +61,17 @@ class Busquedas {
 
         try {
 
-
-
             //Petición HTTP
             const instance = axios.create({
                 baseURL: `https://api.openweathermap.org/data/2.5/weather`,
-                params: {...this.paramsWeather, lat, lon}
+                params: { ...this.paramsWeather, lat, lon }
             });
 
             const resp = await instance.get();
+            const { weather, main } = resp.data;
 
             return {
-                desc: main.weather.map(clima => { clima.description }),
+                desc: weather[0].description,
                 min: main.temp_min,
                 max: main.temp_max,
                 temp: main.temp
@@ -74,6 +80,41 @@ class Busquedas {
             console.log(error)
         }
     }
+
+    agregarHistorial(lugar = '') {
+        if (this.historial.includes(lugar.toLowerCase())) {
+            return
+        }
+
+        this.historial = this.historial.splice(0, 5);
+
+        this.historial.unshift(lugar.toLowerCase());
+
+        //Grabar en DB
+        this.guardarDB();
+    }
+
+    guardarDB() {
+
+        const payload = {
+            historial: this.historial
+        }
+
+        fs.writeFileSync(this.dbPath, JSON.stringify(payload));
+    }
+
+    leerDB() {
+        //verificar que exista el archivo
+        if(!fs.existsSync(this.dbPath)){
+            return
+        }
+
+        const info = fs.readFileSync(this.dbPath, {encoding: 'utf-8'});
+        const data = JSON.parse(info);
+        this.historial = data.historial;
+    }
+
+     
 }
 
 module.exports = Busquedas;
